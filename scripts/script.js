@@ -1,42 +1,66 @@
-//Game
+const selectionButtons = document.querySelectorAll("[data-selection]")
+const finalColumn=document.querySelector('[data-final-column]')
+const computerScoreSpan=document.querySelector('[data-computer-score]')
+const yourScoreSpan=document.querySelector('[data-your-score]')
+const SELECTIONS =[
+  {
+    name:'rock',
+    emoji: '✊',
+    beats: 'scissors'
+  },
+  {
+    name:'paper',
+    emoji: '✋',
+    beats: 'rock'
+  },
+  {
+    name:'scissors',
+    emoji: '✌️',
+    beats: 'paper'
+  }
+]
 
-let playerScore = 0;
-let computerScore = 0;
-let roundWinner = "";
+selectionButtons.forEach((selectionButton) => {
+  selectionButton.addEventListener("click", (e) => {
+    const selectionName = selectionButton.dataset.selection;
+    const selection = SELECTIONS.find(selection =>selection.name === selectionName)
+    makeSelection(selection);
+  });
+});
 
-function playRound(playerSelection, computerSelection) {
-  if (playerSelection === computerSelection) {
-    roundWinner = "TIE!";
-  }
-  if (
-    (playerSelection === "ROCK" && computerSelection === "SCISSORS") ||
-    (playerSelection === "SCISSORS" && computerSelection == "PAPER") ||
-    (playerSelection === "PAPER" && computerSelection == "ROCK")
-  ) {
-    playerScore++;
-    roundWinner = "player";
-  }
-  if (
-    (computerSelection === "ROCK" && playerSelection === "SCISSORS") ||
-    (computerSelection === "SCISSORS" && playerSelection === "PAPER") ||
-    (computerSelection === "PAPER" && playerSelection === "ROCK")
-  ) {
-    computerScore++;
-    roundWinner = "computer";
-  }
+function makeSelection(selection) {
+  const computerSelection = randomSelection();
+  const yourWinner =isWinner(selection,computerSelection);
+  const computerWinner=isWinner(computerSelection,selection);
+  console.log(computerSelection);
+  
+  
+  addSelectionResult(computerSelection,computerWinner);
+  addSelectionResult(selection,yourWinner);
+
+  if (yourWinner) incrementScore(yourScoreSpan)
+  if (computerWinner) incrementScore(computerScoreSpan)
 }
 
-function getRandomChoice() {
-  let randomNumber = math.floor(Math.random() *3)
-    playRound(playerSelection, computerSelection);
-    switch (randomNumber) {
-        case 0: return "ROCK";
-        case 1: return "PAPER";
-        case 2 : return "SCISSORS";
-    }
-  }
+function incrementScore(scoreSpan){
+  scoreSpan.innerText= parseInt(scoreSpan.innerText)+1
+}
+
+function addSelectionResult(selection,winner){
+  const div=document.createElement("div");
+  div.innerHTML=selection.emoji;
+  div.classList.add('result-selection')
+  if(winner) div.classList.add('winner');
+  finalColumn.after(div)
+}
+
+function isWinner(selection, opponentSelection) {
+  return selection.beats === opponentSelection.name
+}
 
 
-function isGameOver() {
-  return playerScore==="5" || computerScore==="5";
+
+function randomSelection() {
+  const randomIndex=Math.floor(Math.random()* SELECTIONS.length);
+  return SELECTIONS[randomIndex]
 }
